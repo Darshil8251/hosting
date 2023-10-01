@@ -1,7 +1,5 @@
 require("dotenv").config();
-const {
-  TranscriptionInstance,
-} = require("twilio/lib/rest/api/v2010/account/transcription");
+
 const CustomerMaster = require("../Model/CustomerModel");
 const milkDetail = require("../Model/milkPriceModel");
 const providerModel = require("../Model/providerModel");
@@ -9,9 +7,7 @@ const transactionModel = require("../Model/transaction");
 const dbconnection = require("../config/dbconnection");
 const moment = require("moment");
 const paymentModel = require("../Model/paymentModel");
-const accountSid = process.env.TWILIO_ACCOUNT_SID.replace(/;/g, "");
-const authToken = process.env.TWILIO_AUTH_TOKEN.replace(/;/g, "");
-const phoneNumber = process.env.TWILIO_PHONENUMBER;
+
 const { DateTime } = require("luxon");
 const MilkInfoModel = require("../Model/milkInfoModel");
 
@@ -649,38 +645,7 @@ const milkTransaction = async (req, resp) => {
 
 // it is for sending the message
 
-const sendMessage = async (req, resp) => {
-  const client = require("twilio")(accountSid, authToken);
-  try {
-    client.messages
-      .create({
-        body: "hi Your  One Time Password is " + req.body.otp,
-        from: phoneNumber,
-        to: req.body.phoneNumber,
-      })
-      .then(() => {
-        resp.status(200).send({
-          success: true,
-          message: "Message sent successfully",
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        resp.status(500).send({
-          success: false,
-          message: err,
-        });
-      });
-  } catch (error) {
-    console.log(error);
-    resp.status(500).send({
-      success: false,
-      message: error,
-    });
-  }
-};
 
-// add the price
 
 const addPrice = async (req, resp) => {
   const addPice = new milkDetail(req.body);
@@ -1247,7 +1212,6 @@ module.exports = {
   customerDissApprove,
   getCustomer,
   milkTransaction,
-  sendMessage,
   historyOfCustomer,
   historyOfPayment,
   addCustomerPayment,

@@ -1,13 +1,6 @@
  const express = require('express');
-const { providerRegistration, isProviderExists, customerApprove, customerDissApprove, getCustomer, milkTransaction, sendMessage, historyOfPayment, addCustomerPaymentDetails, addPrice, addCustomerPayment, historyOfCustomer, getSalesInformation, approveMilkQuantity, customerListToChangeMilkVolume, findMilkDetails } = require('../controller/providerController');
+const { providerRegistration, isProviderExists, customerApprove, customerDissApprove, getCustomer, milkTransaction,  historyOfPayment, addCustomerPaymentDetails, addPrice, addCustomerPayment, historyOfCustomer, getSalesInformation, approveMilkQuantity, customerListToChangeMilkVolume, findMilkDetails } = require('../controller/providerController');
 const { route } = require('./customerRoutes');
-
-const { Vonage } = require('@vonage/server-sdk')
-
-const vonage = new Vonage({
-  apiKey: "478acfab",
-  apiSecret: "bkXuV2WOLemnr42t"
-})
 
 
 
@@ -38,12 +31,6 @@ router.post('/getCustomer',getCustomer);
 
 // Here Start Transaction API
 router.post("/milkTransaction",milkTransaction);
-
-
-// it is for sending the message 
-router.post("/sendMessage",sendMessage);
-
-
 
 // it is for history of customer 
 
