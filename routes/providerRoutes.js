@@ -1,5 +1,5 @@
  const express = require('express');
-const { providerRegistration, isProviderExists, dissApproveCustomerList, customerApprove, customerDissApprove, getCustomer, milkTransaction, sendMessage, historyOfPayment, addCustomerPaymentDetails, addPrice, addCustomerPayment, historyOfCustomer, getSalesInformation, approveMilkQuantity, customerListToChangeMilkVolume, findMilkDetails } = require('../controller/providerController');
+const { providerRegistration, isProviderExists, customerApprove, customerDissApprove, getCustomer, milkTransaction, sendMessage, historyOfPayment, addCustomerPaymentDetails, addPrice, addCustomerPayment, historyOfCustomer, getSalesInformation, approveMilkQuantity, customerListToChangeMilkVolume, findMilkDetails } = require('../controller/providerController');
 const { route } = require('./customerRoutes');
 
 const { Vonage } = require('@vonage/server-sdk')
@@ -23,7 +23,7 @@ router.post('/isProviderExists',isProviderExists);
 
 
 // POST || DISSAPPROVECUSTOMERLIST
-router.post('/dissApproveCustomerList',dissApproveCustomerList);
+// router.post('/dissApproveCustomerList',dissApproveCustomerList);
 
 // POST || FOR CUSTOMER APPROVE
 router.post('/customerApprove',customerApprove);

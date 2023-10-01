@@ -99,7 +99,7 @@ const isProviderExists = async (req, resp) => {
 
 // it is for disapproval customer list
 
-l̥
+
 
 // it is for customer approval
 const customerApprove = async (req, resp) => {
@@ -1243,7 +1243,6 @@ const findMilkDetails = async (req, resp) => {
 module.exports = {
   providerRegistration,
   isProviderExists,
-  dissApproveCustomerList,
   customerApprove,
   customerDissApprove,
   getCustomer,
