@@ -95,7 +95,36 @@ const isProviderExists = async (req, resp) => {
 
 // it is for disapproval customer list
 
+const dissApproveCustomerList = async (req, res) => {
+  try {
+    const providerId = req.body.providerId;
 
+    const provider = await providerModel.findById({
+      _id: providerId,
+    });
+
+    const dissAproveCusotomerList = provider.AllCustomers;
+
+    if (dissAproveCusotomerList.length > 0) {
+      res.status(200).send({
+        success: true,
+        dissAproveCusotomerList,
+      });
+    } else {
+      res.status(201).send({
+        success: true,
+        message: "customer Not Found",
+      });
+    }
+   
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      error,
+    });
+  }
+};
 
 // it is for customer approval
 const customerApprove = async (req, resp) => {
@@ -644,8 +673,6 @@ const milkTransaction = async (req, resp) => {
 };
 
 // it is for sending the message
-
-
 
 const addPrice = async (req, resp) => {
   const addPice = new milkDetail(req.body);
@@ -1207,6 +1234,7 @@ const findMilkDetails = async (req, resp) => {
 
 module.exports = {
   providerRegistration,
+  dissApproveCustomerList,
   isProviderExists,
   customerApprove,
   customerDissApprove,
