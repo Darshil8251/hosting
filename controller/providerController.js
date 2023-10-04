@@ -1,5 +1,5 @@
 require("dotenv").config();
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const CustomerMaster = require("../Model/CustomerModel");
 const milkDetail = require("../Model/milkPriceModel");
@@ -104,6 +104,7 @@ const dissApproveCustomerList = async (req, res) => {
       providerId: providerId,
       isApprove: false,
     });
+    console.log(customerList);
 
     const customerDetails = [];
     for (let i = 0; i < customerList.length; i++) {
@@ -111,6 +112,7 @@ const dissApproveCustomerList = async (req, res) => {
       const customer = await CustomerMaster.findById({
         _id: milkInfo.customerId,
       });
+
       customerDetails.push(customer);
     }
 
@@ -200,14 +202,13 @@ const customerDissApprove = async (req, resp) => {
 const getCustomer = async (req, resp) => {
   try {
     const providerId = req.body.providerId;
-    console.log(providerId);
 
     const customerList = await MilkInfoModel.find({
       providerId: providerId,
       isApprove: true,
     });
 
-    if (customerList.length < 0) {
+    if (customerList.length < 1) {
       resp.status(201).send({
         success: false,
         message: "Customer Not Found",
@@ -220,7 +221,7 @@ const getCustomer = async (req, resp) => {
         const customer = await CustomerMaster.findOne({
           _id: associationDetails.customerId,
         });
-     
+
         customerDetails.push(customer);
       }
       resp.status(200).send({
@@ -251,14 +252,15 @@ const milkTransaction = async (req, resp) => {
       date: getday,
     });
 
-    const allPrice = await milkDetail.findOne({
-      providerId: req.body.providerId,
-      active: true,
+    const provider= await providerModel.findById({
+      _id: req.body.providerId
     });
 
-    const cowPrice = allPrice.cowPrice;
-    const buffelowPrice = allPrice.buffelowPrice;
-    const otherPrice = allPrice.otherPrice;
+  
+
+    const cowPrice = provider.cowPrice;
+    const buffelowPrice =provider.buffelowPrice;
+    const otherPrice = provider.otherPrice;
 
     // if transaction available
     if (transaction) {

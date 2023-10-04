@@ -142,34 +142,46 @@ const addProvider = async (req, resp) => {
         message: "Provider already exists",
       });
     } else {
-      const newMilkDetail = new MilkInfoModel({
+      const isProviderExist = await MilkInfoModel.findOne({
         customerId: req.body.customerId,
         providerId: req.body.providerId,
-
-        cowMorning: customerMorningCowVolume,
-        cowEvening: customerEveningCowVolume,
-
-        buffelowMorning: customerMorningBuffeloVolume,
-        buffelowEvening: customerEveningBuffeloVolume,
-
-        otherMorning: customerMorningOtherVolume,
-        otherEvening: customerEveningOtherVolume,
+        isApprove: false,
       });
-      await newMilkDetail
-        .save()
-        .then((result) => {
-          resp.status(200).send({
-            success: true,
-            message: "We have sent to the provider",
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-          resp.status(201).send({
-            success: false,
-            message: "unable to send request to provider",
-          });
+      if (isProviderExist) {
+        resp.status(201).send({
+          success: false,
+          message: "request already sent to provider",
         });
+      } else {
+        const newMilkDetail = new MilkInfoModel({
+          customerId: req.body.customerId,
+          providerId: req.body.providerId,
+
+          cowMorning: customerMorningCowVolume,
+          cowEvening: customerEveningCowVolume,
+
+          buffelowMorning: customerMorningBuffeloVolume,
+          buffelowEvening: customerEveningBuffeloVolume,
+
+          otherMorning: customerMorningOtherVolume,
+          otherEvening: customerEveningOtherVolume,
+        });
+        await newMilkDetail
+          .save()
+          .then((result) => {
+            resp.status(200).send({
+              success: true,
+              message: "We have sent to the provider",
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            resp.status(201).send({
+              success: false,
+              message: "unable to send request to provider",
+            });
+          });
+      }
     }
   } catch (error) {
     console.error(error);
