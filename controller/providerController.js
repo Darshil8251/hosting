@@ -1,4 +1,5 @@
 require("dotenv").config();
+const mongoose = require('mongoose');
 
 const CustomerMaster = require("../Model/CustomerModel");
 const milkDetail = require("../Model/milkPriceModel");
@@ -99,24 +100,25 @@ const dissApproveCustomerList = async (req, res) => {
   try {
     const providerId = req.body.providerId;
 
-    const provider = await providerModel.findById({
-      _id: providerId,
+    const customerList = await MilkInfoModel.find({
+      providerId: providerId,
+      isApprove: false,
     });
 
-    const dissAproveCusotomerList = provider.AllCustomers;
-
-    if (dissAproveCusotomerList.length > 0) {
-      res.status(200).send({
-        success: true,
-        dissAproveCusotomerList,
+    const customerDetails = [];
+    for (let i = 0; i < customerList.length; i++) {
+      const milkInfo = customerList[i];
+      const customer = await CustomerMaster.findById({
+        _id: milkInfo.customerId,
       });
-    } else {
-      res.status(201).send({
-        success: true,
-        message: "customer Not Found",
-      });
+      customerDetails.push(customer);
     }
-   
+
+    res.status(200).send({
+      success: true,
+      customerList,
+      customerDetails,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -129,101 +131,35 @@ const dissApproveCustomerList = async (req, res) => {
 // it is for customer approval
 const customerApprove = async (req, resp) => {
   try {
-    // find the provider
-    const provider = await providerModel.findByIdAndUpdate({
-      _id: req.body.providerId,
+    const customerId = req.body.customerId;
+    const providerId = req.body.providerId;
+
+    const associationDetails = await MilkInfoModel.findOne({
+      customerId: customerId,
+      providerId: providerId,
+      isApprove: false,
     });
-
-    // find the customer
-    const insertCustomer = await CustomerMaster.findById({
-      _id: req.body.customerId,
-    });
-
-    // find the milk quantity
-    const milkQuantity = await MilkInfoModel.findOne({
-      providerId: req.body.providerId,
-      customerId: req.body.customerId,
-    });
-
-    if (provider && insertCustomer && milkQuantity) {
-      const modifiedCustomer = JSON.parse(JSON.stringify(insertCustomer));
-
-      // Remove the 'allProvider' and 'approveProvider' fields from the copied object
-      delete modifiedCustomer.allProvider;
-      delete modifiedCustomer.approveProvider;
-
-      // find the index of customer
-      const customerIndex = provider.AllCustomers.findIndex(
-        (obj) => obj._id == req.body.customerId
-      );
-
-      // if index -1 then
-
-      if (customerIndex == -1) {
-        resp.status(401).send({
-          success: false,
-          message: "You Have Alredy Approve The customer",
+    associationDetails.isApprove = true;
+    await associationDetails
+      .save()
+      .then((result) => {
+        resp.status(200).send({
+          success: true,
+          message: "customer Approve successfully",
         });
-      }
-
-      // find the customer
-      const customer = await CustomerMaster.findByIdAndUpdate({
-        _id: req.body.customerId,
-      });
-
-      const insertProvider = await providerModel.findById({
-        _id: req.body.providerId,
-      });
-
-      const modifiedProvider = JSON.parse(JSON.stringify(insertProvider));
-      delete modifiedProvider.AllCustomers;
-      delete modifiedProvider.ApproveCustomers;
-
-      const providerIndex = customer.allProvider.findIndex(
-        (obj) => obj._id == req.body.providerId
-      );
-
-      // if index -1
-      if (providerIndex == -1) {
-        resp.status(4001).send({
+      })
+      .catch((error) => {
+        console.log(error);
+        resp.status(201).send({
           success: false,
-          message: "You have Already Approve the customer",
+          message: "Soory But customer Not approved successfully",
         });
-      }
-
-      // if we get index!=-1 that means not customer found
-      else if (customerIndex != -1) {
-        provider.AllCustomers.splice(customerIndex, 1);
-        provider.ApproveCustomers.push(modifiedCustomer);
-        await provider.save();
-      }
-
-      // it is for index!=-1
-      if (providerIndex != -1) {
-        customer.allProvider.splice(providerIndex, 1);
-        customer.approveProvider.push(modifiedProvider);
-        await customer.save();
-      }
-
-      // her approve the milkQuantity of the customer
-      milkQuantity.isApprove = true;
-      await milkQuantity.save();
-
-      resp.status(200).send({
-        success: true,
-        message: "Customer Approve Successfully",
       });
-    } else {
-      resp.status(401).send({
-        success: false,
-        message: "Sufficient Data Not Found",
-      });
-    }
   } catch (error) {
     console.log(error);
     resp.status(500).send({
       success: false,
-      message: error,
+      error,
     });
   }
 };
@@ -231,71 +167,24 @@ const customerApprove = async (req, resp) => {
 // it is for customerDisapproval
 const customerDissApprove = async (req, resp) => {
   try {
-    const milkInfo = await MilkInfoModel.findOne({
+    const milkInfo = await MilkInfoModel.findOneAndDelete({
       customerId: req.body.customerId,
       providerId: req.body.providerId,
       isApprove: false,
     });
 
-    const provider = await providerModel.findByIdAndUpdate({
-      _id: req.body.providerId,
-    });
-
-    const customer = await CustomerMaster.findByIdAndUpdate({
-      _id: req.body.customerId,
-    });
-
-    if (milkInfo && provider && customer) {
-      await milkInfo.remove();
-      await milkInfo.save();
-
-      // find the index of customer
-      const customerIndex = provider.AllCustomers.findIndex(
-        (obj) => obj._id == req.body.customerId
-      );
-
-      // find customer  index
-
-      const providerIndex = customer.allProvider.findIndex(
-        (obj) => obj._id == req.body.providerId
-      );
-
-      // if index 1
-      if (customerIndex == -1) {
-        resp.status(401).send({
-          success: false,
-          message: "You Have Already Disapprove Customer",
-        });
-      }
-
-      // if provider index -1
-
-      if (providerIndex == -1) {
-        resp.status(401).send({
-          success: false,
-          message: "You Have already Disapprove Customer",
-        });
-      }
-
-      // if we get index=-1 that means not customer found
-      if (customerIndex != -1) {
-        provider.AllCustomers.splice(customerIndex, 1);
-        await provider.save();
-      }
-
-      if (providerIndex != -1) {
-        customer.allProvider.splice(providerIndex, 1);
-        await customer.save();
-      }
-
+    // Check if a document was found and deleted
+    if (milkInfo) {
+      console.log("Deleted milkInfo document:", milkInfo);
       resp.status(200).send({
         success: true,
-        message: "Customer Disapprove Successfully",
+        message: "customer deleted successfully",
       });
     } else {
-      resp.status(200).send({
+      console.log("No matching milkInfo document found.");
+      resp.status(404).send({
         success: false,
-        message: "Something Went Wrong",
+        message: "customer not found",
       });
     }
   } catch (error) {
@@ -310,20 +199,34 @@ const customerDissApprove = async (req, resp) => {
 // it is for getting the detail of customer
 const getCustomer = async (req, resp) => {
   try {
-    const provider = await providerModel.findById({ _id: req.body.providerId });
+    const providerId = req.body.providerId;
+    console.log(providerId);
 
-    const allCustomer = provider.ApproveCustomers;
+    const customerList = await MilkInfoModel.find({
+      providerId: providerId,
+      isApprove: true,
+    });
 
-    if (allCustomer.length == 0) {
-      resp.status(200).send({
+    if (customerList.length < 0) {
+      resp.status(201).send({
         success: false,
-        message: "No Customer Available",
+        message: "Customer Not Found",
       });
     } else {
+      const customerDetails = [];
+
+      for (let i = 0; i < customerList.length; i++) {
+        const associationDetails = customerList[i];
+        const customer = await CustomerMaster.findOne({
+          _id: associationDetails.customerId,
+        });
+     
+        customerDetails.push(customer);
+      }
       resp.status(200).send({
         success: true,
-        message: "All Customer",
-        customer: allCustomer,
+        customerList,
+        customerDetails,
       });
     }
   } catch (error) {

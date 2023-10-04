@@ -155,28 +155,21 @@ const addProvider = async (req, resp) => {
         otherMorning: customerMorningOtherVolume,
         otherEvening: customerEveningOtherVolume,
       });
-      await newMilkDetail.save();
-      const addProvider = await providerModel.findByIdAndUpdate({
-        _id: req.body.providerId,
-      });
-
-      const addCustomer = await CustomerMaster.findByIdAndUpdate({
-        _id: customerId,
-      });
-      addCustomer.allProvider.push(addProvider);
-      await addCustomer.save();
-
-      const customer = await CustomerMaster.findById({
-        _id: customerId,
-      });
-
-      addProvider.AllCustomers.push(customer);
-      await addProvider.save();
-
-      resp.status(200).send({
-        success: true,
-        message: "We have sent to the provider",
-      });
+      await newMilkDetail
+        .save()
+        .then((result) => {
+          resp.status(200).send({
+            success: true,
+            message: "We have sent to the provider",
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          resp.status(201).send({
+            success: false,
+            message: "unable to send request to provider",
+          });
+        });
     }
   } catch (error) {
     console.error(error);

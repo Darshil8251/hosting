@@ -52,15 +52,6 @@ const providerSchema = new mongoose.Schema(
       default: 0,
       require: true,
     },
-
-    AllCustomers: {
-      type: [Object],
-      default: [],
-    },
-    ApproveCustomers: {
-      type: [Object],
-      default: [],
-    },
   },
   { timestamps: true }
 );

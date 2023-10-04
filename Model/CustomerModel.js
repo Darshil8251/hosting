@@ -33,14 +33,6 @@ const CustomerMasterSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    allProvider: {
-      type: [Object],
-      default: [],
-    },
-    approveProvider: {
-      type: [Object],
-      default: [],
-    },
   },
   { timestamps: true }
 );
