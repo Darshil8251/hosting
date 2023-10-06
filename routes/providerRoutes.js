@@ -8,11 +8,11 @@ const {
   getCustomer,
   milkTransaction,
   historyOfPayment,
-  addCustomerPaymentDetails,
+  // addCustomerPaymentDetails,
   addPrice,
   addCustomerPayment,
   historyOfCustomer,
-  getSalesInformation,
+  // getSalesInformation,
   approveMilkQuantity,
   customerListToChangeMilkVolume,
   findMilkDetails,
@@ -60,7 +60,7 @@ router.post("/addPrice", addPrice);
 router.post("/historyOfTransaction", historyOfPayment);
 
 // it is for getting the sale information
-router.post("/getSalesInformation", getSalesInformation);
+// router.post("/getSalesInformation", getSalesInformation);
 
 // customer List which have request to change milk volume
 router.post("/customerListToChangeMilkVolume", customerListToChangeMilkVolume);

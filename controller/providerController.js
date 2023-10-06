@@ -2,7 +2,6 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 
 const CustomerMaster = require("../Model/CustomerModel");
-const milkDetail = require("../Model/milkPriceModel");
 const providerModel = require("../Model/providerModel");
 const transactionModel = require("../Model/transaction");
 const dbconnection = require("../config/dbconnection");
@@ -600,6 +599,7 @@ const addPrice = async (req, resp) => {
     });
 };
 
+
 // it is for show the history of customers
 const historyOfCustomer = async (req, resp) => {
   try {
@@ -610,8 +610,6 @@ const historyOfCustomer = async (req, resp) => {
       })
       .sort({ _id: -1 })
       .exec();
-
-    console.log(history);
 
     if (history) {
       resp.status(200).send({
@@ -868,161 +866,161 @@ const historyOfPayment = async (req, res) => {
 
 // it is for finding the sales information
 
-const getSalesInformation = async (req, resp) => {
-  try {
-    // it is for total amount of milk
-    let totalCow = 0;
-    let totalBuffelow = 0;
-    let totalOther = 0;
-    const year = req.body.year;
-    const month = getMonthDigit(req.body.month);
+// const getSalesInformation = async (req, resp) => {
+//   try {
+//     // it is for total amount of milk
+//     let totalCow = 0;
+//     let totalBuffelow = 0;
+//     let totalOther = 0;
+//     const year = req.body.year;
+//     const month = getMonthDigit(req.body.month);
 
-    const price = await milkDetail.findOne({
-      providerId: req.body.providerId,
-      active: true,
-    });
+//     const price = await milkDetail.findOne({
+//       providerId: req.body.providerId,
+//       active: true,
+//     });
 
-    let cowPrice = 0;
-    let buffelowPrice = 0;
-    let otherPrice = 0;
+//     let cowPrice = 0;
+//     let buffelowPrice = 0;
+//     let otherPrice = 0;
 
-    if (price) {
-      cowPrice = price.cowPrice;
-      buffelowPrice = price.buffelowPrice;
-      otherPrice = price.otherPrice;
-    }
+//     if (price) {
+//       cowPrice = price.cowPrice;
+//       buffelowPrice = price.buffelowPrice;
+//       otherPrice = price.otherPrice;
+//     }
 
-    if (month != 0) {
-      const startDate = DateTime.fromObject({ year, month, day: 1 }).toJSDate();
-      const endDate = DateTime.fromObject({ year, month, day: 1 })
-        .endOf("month")
-        .toJSDate();
+//     if (month != 0) {
+//       const startDate = DateTime.fromObject({ year, month, day: 1 }).toJSDate();
+//       const endDate = DateTime.fromObject({ year, month, day: 1 })
+//         .endOf("month")
+//         .toJSDate();
 
-      const query = {
-        providerId: req.body.providerId,
-        date: {
-          $gte: startDate,
-          $lte: endDate,
-        },
-      };
+//       const query = {
+//         providerId: req.body.providerId,
+//         date: {
+//           $gte: startDate,
+//           $lte: endDate,
+//         },
+//       };
 
-      const transactions = await transactionModel.find(query);
+//       const transactions = await transactionModel.find(query);
 
-      if (transactions.length != 0) {
-        for (let index = 0; index < transactions.length; index++) {
-          const element = transactions[index];
-          totalCow += element.cowMorning + element.cowEvening;
-          totalBuffelow += element.buffelowMorning + element.buffelowEvening;
-          totalOther += element.otherMorning + element.otherEvening;
-        }
+//       if (transactions.length != 0) {
+//         for (let index = 0; index < transactions.length; index++) {
+//           const element = transactions[index];
+//           totalCow += element.cowMorning + element.cowEvening;
+//           totalBuffelow += element.buffelowMorning + element.buffelowEvening;
+//           totalOther += element.otherMorning + element.otherEvening;
+//         }
 
-        const totalCowSales = totalCow * cowPrice;
-        const totalBuffelowSales = totalBuffelow * buffelowPrice;
-        const totalOtherSales = totalOther * otherPrice;
+//         const totalCowSales = totalCow * cowPrice;
+//         const totalBuffelowSales = totalBuffelow * buffelowPrice;
+//         const totalOtherSales = totalOther * otherPrice;
 
-        if (price) {
-          resp.status(200).send({
-            success: true,
-            message: "Data found successfully",
-            price: true,
-            totalCow,
-            totalBuffelow,
-            totalOther,
-            totalCowSales,
-            totalBuffelowSales,
-            totalOtherSales,
-          });
-        } else {
-          resp.status(200).send({
-            success: true,
-            price: true,
-            message:
-              "Data found successfully but You are not add price of milk",
-            totalCow,
-            totalBuffelow,
-            totalOther,
-          });
-        }
-      } else {
-        resp.status(200).send({
-          success: false,
-          message: "Data Not Found",
-        });
-      }
-    } else {
-      const startDate = DateTime.fromObject({
-        year,
-        month: 1,
-        day: 1,
-      }).toJSDate();
-      const endDate = DateTime.fromObject({
-        year,
-        month: 12,
-        day: 31,
-        hour: 23,
-        minute: 59,
-        second: 59,
-      }).toJSDate();
+//         if (price) {
+//           resp.status(200).send({
+//             success: true,
+//             message: "Data found successfully",
+//             price: true,
+//             totalCow,
+//             totalBuffelow,
+//             totalOther,
+//             totalCowSales,
+//             totalBuffelowSales,
+//             totalOtherSales,
+//           });
+//         } else {
+//           resp.status(200).send({
+//             success: true,
+//             price: true,
+//             message:
+//               "Data found successfully but You are not add price of milk",
+//             totalCow,
+//             totalBuffelow,
+//             totalOther,
+//           });
+//         }
+//       } else {
+//         resp.status(200).send({
+//           success: false,
+//           message: "Data Not Found",
+//         });
+//       }
+//     } else {
+//       const startDate = DateTime.fromObject({
+//         year,
+//         month: 1,
+//         day: 1,
+//       }).toJSDate();
+//       const endDate = DateTime.fromObject({
+//         year,
+//         month: 12,
+//         day: 31,
+//         hour: 23,
+//         minute: 59,
+//         second: 59,
+//       }).toJSDate();
 
-      const query = {
-        providerId: req.body.providerId,
-        paymentDate: {
-          $gte: startDate,
-          $lte: endDate,
-        },
-      };
+//       const query = {
+//         providerId: req.body.providerId,
+//         paymentDate: {
+//           $gte: startDate,
+//           $lte: endDate,
+//         },
+//       };
 
-      const transactions = await transactionModel.find(query);
+//       const transactions = await transactionModel.find(query);
 
-      if (transactions.length != 0) {
-        for (let index = 0; index < transactions.length; index++) {
-          const element = transactions[index];
-          totalCow += element.cowMorning + element.cowEvening;
-          totalBuffelow += element.buffellowMorning + element.buffellowEvening;
-          totalOther += element.otherMorning + element.otherEvening;
-        }
-        const totalCowSales = totalCow * cowPrice;
-        const totalBuffelowSales = totalBuffelow * buffelowPrice;
-        const totalOtherSales = totalOther * otherPrice;
+//       if (transactions.length != 0) {
+//         for (let index = 0; index < transactions.length; index++) {
+//           const element = transactions[index];
+//           totalCow += element.cowMorning + element.cowEvening;
+//           totalBuffelow += element.buffellowMorning + element.buffellowEvening;
+//           totalOther += element.otherMorning + element.otherEvening;
+//         }
+//         const totalCowSales = totalCow * cowPrice;
+//         const totalBuffelowSales = totalBuffelow * buffelowPrice;
+//         const totalOtherSales = totalOther * otherPrice;
 
-        if (price) {
-          resp.status(200).send({
-            success: true,
-            message: "Data Found Successfully",
-            price: true,
-            totalCow,
-            totalBuffelow,
-            totalOther,
-            totalCowSales,
-            totalBuffelowSales,
-            totalOtherSales,
-          });
-        } else {
-          resp.status(200).send({
-            success: true,
-            price: true,
-            message:
-              "Data Found Successfully but You are not add price of milk",
-            totalCow,
-            totalBuffelow,
-            totalOther,
-          });
-        }
-      } else {
-        resp.status(200).send({
-          success: false,
-          message: "Data Not Found",
-        });
-      }
-    }
-  } catch (error) {
-    console.log(error);
-    resp.status(500).send({
-      success: false,
-      message: error,
-    });
-  }
-};
+//         if (price) {
+//           resp.status(200).send({
+//             success: true,
+//             message: "Data Found Successfully",
+//             price: true,
+//             totalCow,
+//             totalBuffelow,
+//             totalOther,
+//             totalCowSales,
+//             totalBuffelowSales,
+//             totalOtherSales,
+//           });
+//         } else {
+//           resp.status(200).send({
+//             success: true,
+//             price: true,
+//             message:
+//               "Data Found Successfully but You are not add price of milk",
+//             totalCow,
+//             totalBuffelow,
+//             totalOther,
+//           });
+//         }
+//       } else {
+//         resp.status(200).send({
+//           success: false,
+//           message: "Data Not Found",
+//         });
+//       }
+//     }
+//   } catch (error) {
+//     console.log(error);
+//     resp.status(500).send({
+//       success: false,
+//       message: error,
+//     });
+//   }
+// };
 
 // it is for approve the changes of milk quantity
 
@@ -1149,7 +1147,7 @@ module.exports = {
   historyOfPayment,
   addCustomerPayment,
   addPrice,
-  getSalesInformation,
+  // getSalesInformation,
   customerListToChangeMilkVolume,
   approveMilkQuantity,
   findMilkDetails,

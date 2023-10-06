@@ -193,27 +193,34 @@ const addProvider = async (req, resp) => {
 
 const getProvider = async (req, resp) => {
   try {
-    const customer = await CustomerMaster.findById({
-      _id: req.body.customerId,
+    const customerId = req.body.customerId;
+
+    const providerList = await MilkInfoModel.find({
+      customerId: customerId,
+      isApprove: true,
     });
 
-    const allProvider = customer.approveProvider;
-    const allMilkquantity = [];
-    for (let i = 0; i < allProvider.length; i++) {
-      const provider = allProvider[i];
-      const providerId = provider._id;
-      const milkDetails = await MilkInfoModel.findOne({
-        customerId: req.body.customerId,
-        providerId: providerId,
-        isApprove: true,
-      });
-      allMilkquantity.push(milkDetails);
+
+    if(providerList.length<1){
+      resp.status(201).send({
+        success:false,
+        message:"Customer not found"
+      })
     }
+    const providerDetails=[];
+
+    for(let i=0;i<providerList.length;i++) {
+         const association=providerList[i];
+         const provider=await providerModel.findById({
+          _id:association.providerId
+         });
+         providerDetails.push(provider);
+    }
+
     resp.status(200).send({
       success: true,
-      message: "All Provider",
-      allProvider,
-      allMilkquantity,
+      providerList,
+      providerDetails
     });
   } catch (error) {
     console.log(error);
